@@ -25,7 +25,7 @@ const Login = () => {
       // Call login function from AuthContext
       await login(formData.username, formData.password);
       // Redirect to home page or any other desired route
-      navigate('/');
+      navigate('/companies');
     } catch (error) {
       console.error('Error logging in:', error);
       // Handle error

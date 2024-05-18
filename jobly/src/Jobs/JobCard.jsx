@@ -1,16 +1,53 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, Typography, Button } from '@mui/material';
+import JoblyApi from '../JoblyApi'; // Import the JoblyApi class
+import { useAuth } from '../AuthContext'; // Import useAuth hook
 
-const JobsCard = ({ job }) => {
+const JobCard = ({ job }) => {
+  const { user } = useAuth(); // Destructure user from useAuth hook
+  const [applied, setApplied] = useState(false);
+
+  useEffect(() => {
+    const isApplied = localStorage.getItem(`job_${job.id}_applied`);
+    if (isApplied) {
+      setApplied(true);
+    }
+  }, [job.id]);
+
+  const handleApply = async () => {
+    try {
+      await JoblyApi.applyToJob(user.username, job.id); // Call applyToJob method from JoblyApi
+      localStorage.setItem(`job_${job.id}_applied`, 'true'); // Store applied status in local storage
+      setApplied(true); // Update local state to indicate job application
+    } catch (error) {
+      console.error('Error applying for job:', error);
+      // Handle error
+    }
+  };
+
   return (
-    <Link to={`/jobs/${job.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-      <div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-        <h3>{job.title}</h3>
-        <p>{job.description}</p>
-        <p>Company: {job.companyName}</p>
-      </div>
-    </Link>
+    <Card sx={{ minWidth: 275, marginBottom: 2 }}>
+      <CardContent>
+        <Typography variant="h6" component="div">
+          {job.title}
+        </Typography>
+        <Typography sx={{ mb: 1.5 }} color="text.secondary">
+          {job.companyName}
+        </Typography>
+        <Typography variant="body2">{job.salary}</Typography>
+        <Typography variant="body2">{job.equity}</Typography>
+        {applied ? (
+          <Button variant="contained" disabled>
+            Applied
+          </Button>
+        ) : (
+          <Button onClick={handleApply} variant="contained" color="primary">
+            Apply
+          </Button>
+        )}
+      </CardContent>
+    </Card>
   );
-}
+};
 
-export default JobsCard;
+export default JobCard;

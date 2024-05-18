@@ -13,8 +13,8 @@ import { AuthProvider } from './AuthContext'; // Import AuthProvider
 
 function App() {
   return (
-    <AuthProvider> {/* Wrap your routes with AuthProvider */}
-      <Router>
+    <Router>
+      <AuthProvider> {/* Wrap your routes with AuthProvider */}
         <div>
           <Navbar />
           <Routes>
@@ -27,8 +27,8 @@ function App() {
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

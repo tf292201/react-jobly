@@ -1,7 +1,7 @@
-// AuthContext.jsx
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; // Correct way to import jwt-decode
 
 // Create the context
 export const AuthContext = createContext();
@@ -14,6 +14,13 @@ export const useAuth = () => {
 // Provide the context to your component tree
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  // function to decode token and set user
+  const setUserFromToken = (token) => {
+    const decodedToken = jwtDecode(token);
+    setUser({ username: decodedToken.username });
+  };
 
   // Login function
   const login = async (username, password) => {
@@ -26,7 +33,7 @@ export const AuthProvider = ({ children }) => {
       // Save token to localStorage or sessionStorage
       localStorage.setItem('token', token);
       // Set the user state
-      setUser({ username });
+      setUserFromToken(token);
     } catch (error) {
       throw new Error('Error logging in');
     }
@@ -38,12 +45,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     // Clear user state
     setUser(null);
-    useNavigate().navigate('/login');
+    // Navigate after state has been updated
+    navigate('/login');
   };
 
   // Value object to be provided by the context
   const value = {
     user,
+    setUserFromToken, // Include setUserFromToken in the context value
     login,
     logout,
   };
